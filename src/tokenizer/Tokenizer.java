@@ -197,13 +197,13 @@ public class Tokenizer {
                 return '\"';
             }
             case 't':{
-                return 't';
+                return '\t';
             }
             case 'n':{
-                return 'n';
+                return '\n';
             }
             case 'r':{
-                return 'r';
+                return '\r';
             }
             case '\\':{
                 return '\\';
