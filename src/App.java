@@ -23,7 +23,7 @@ public class App {
         var iter = new StringIter(scanner);
         var tokenizer = tokenize(iter);
         var tokens = new ArrayList<Token>();
-        if(args[0].equals("--tokenize")){
+        if(args[0].equals("-tokenize")){
             try {
                 while (true) {
                     var token = tokenizer.nextToken();
@@ -40,12 +40,12 @@ public class App {
                 return;
             }
         }
-        else if(args[0].equals("--analyse")){
+        else if(args[0].equals("-analyse")){
             var analyzer = new Analyser(tokenizer);
             List<Instruction> instructions;
             analyzer.analyse();
         }
-        else if(args[0].equals("--generate")){
+        else if(args[0].equals("-generate")){
             var analyzer = new Analyser(tokenizer);
             analyzer.analyse();
             var generator=new Generator(dos,analyzer);
