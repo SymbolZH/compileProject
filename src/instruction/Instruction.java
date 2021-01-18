@@ -52,7 +52,7 @@ public class Instruction {
     public void setX(Integer x) {
         this.x = x;
     }
-    //    nop,pop,stroe8,load8,addi, subi,muli,divi,ret,cmpi,
+//    nop,pop,stroe8,load8,addi, subi,muli,divi,ret,cmpi,
 //    push,globa,loca, arga,br,brfalse,brtrue, call,
     public byte[] toByte() {
 

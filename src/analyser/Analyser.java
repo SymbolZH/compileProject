@@ -52,7 +52,7 @@ public final class Analyser {
 
     /**
      * 获取下一个 Token
-     *
+     * 
      * @return Token
      */
     private Token next() throws TokenizeError {
@@ -67,7 +67,7 @@ public final class Analyser {
 
     /**
      * 如果下一个 token 的类型是 tt，则返回 true
-     *
+     * 
      * @param tt 类型
      * @return Token
      */
@@ -78,7 +78,7 @@ public final class Analyser {
 
     /**
      * 如果下一个 token 的类型是 tt，则前进一个 token 并返回这个 token
-     *
+     * 
      * @param tt 类型
      * @return 如果匹配则返回这个 token，否则返回 null
      */
@@ -93,7 +93,7 @@ public final class Analyser {
 
     /**
      * 如果下一个 token 的类型是 tt，则前进一个 token 并返回，否则抛出异常
-     *
+     * 
      * @param tt 类型
      * @return 这个 token
      * @throws CompileError 如果类型不匹配
@@ -324,40 +324,40 @@ public final class Analyser {
         return brList.toArray(new Instruction[0]);
     }
     private Instruction[] analyseStatement(int offbooleanexpression) throws CompileError {
-        if(check(TokenType.IF_KW)){
-            return analyseIfStatement(offbooleanexpression);
-        }
-        else if(check(TokenType.WHILE_KW)){
-            analyseWhileStatement();
-            return null;
-        }
-        else if(check(TokenType.RETURN_KW)){
-            analyseReturnStatement();
-            return null;
-        }
-        else if (check(TokenType.SEMICOLON)){
-            expect(TokenType.SEMICOLON);
-            return null;
-        }
-        else if(check(TokenType.IDENT)){
-            analyseIdentStatement();
-            return null;
-        }
-        else if(check(TokenType.LET_KW)||check(TokenType.CONST_KW)){
-            analyseDeclaration();
-            return null;
-        }
-        else if(check(TokenType.CONTINUE_KW)){
-            analyseContinueStatement(offbooleanexpression);
-            return null;
-        }
-        else if(check(TokenType.BREAK_KW)){
-            return new Instruction[]{analyseBreakStatement()};
-        }
-        else{
-            throw new ExpectedTokenError(List.of(TokenType.IF_KW,TokenType.WHILE_KW,TokenType.RETURN_KW,
-                    TokenType.SEMICOLON,TokenType.IDENT, TokenType.LET_KW,TokenType.CONST_KW,TokenType.CONTINUE_KW,TokenType.BREAK_KW),next());
-        }
+            if(check(TokenType.IF_KW)){
+                return analyseIfStatement(offbooleanexpression);
+            }
+            else if(check(TokenType.WHILE_KW)){
+                analyseWhileStatement();
+                return null;
+            }
+            else if(check(TokenType.RETURN_KW)){
+                analyseReturnStatement();
+                return null;
+            }
+            else if (check(TokenType.SEMICOLON)){
+                expect(TokenType.SEMICOLON);
+                return null;
+            }
+            else if(check(TokenType.IDENT)){
+                analyseIdentStatement();
+                return null;
+            }
+            else if(check(TokenType.LET_KW)||check(TokenType.CONST_KW)){
+                analyseDeclaration();
+                return null;
+            }
+            else if(check(TokenType.CONTINUE_KW)){
+                analyseContinueStatement(offbooleanexpression);
+                return null;
+            }
+            else if(check(TokenType.BREAK_KW)){
+                return new Instruction[]{analyseBreakStatement()};
+            }
+            else{
+                throw new ExpectedTokenError(List.of(TokenType.IF_KW,TokenType.WHILE_KW,TokenType.RETURN_KW,
+                        TokenType.SEMICOLON,TokenType.IDENT, TokenType.LET_KW,TokenType.CONST_KW,TokenType.CONTINUE_KW,TokenType.BREAK_KW),next());
+            }
     }
     private Instruction analyseBreakStatement() throws CompileError {
         expect(TokenType.BREAK_KW);
@@ -557,7 +557,7 @@ public final class Analyser {
     private void analyseIdentStatement() throws CompileError{
         var nameToken=expect(TokenType.IDENT);
         if(check(TokenType.L_PAREN)){
-            analysefn(nameToken);
+                analysefn(nameToken);
         }
         else if(check(TokenType.ASSIGN)){
             SymbolEntry entry=getvar(nameToken);

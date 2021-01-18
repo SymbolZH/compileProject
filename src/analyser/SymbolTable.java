@@ -22,7 +22,19 @@ public class SymbolTable {
     }
 
 
-
+//    public void addSymbol(String name, boolean isDeclared, int stackOffset, SymbolKind kind, IdentType type, Object value, SymbolTable param, int paramnum,ArrayList<Instruction> instruction, SymbolTable loc,Pos curPos) throws AnalyzeError {
+//        if (this.symbolTable.get(name) != null) {
+//            throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
+//        } else {
+//            if(this.lastTable!=null&&this.lastTable.symbolTable.get(name) != null){
+//                throw new AnalyzeError(ErrorCode.DuplicateDeclaration, curPos);
+//            }
+//            else{
+//                this.symbolTable.put(name, new SymbolEntry(name,isDeclared, stackOffset, kind, type, value, param,paramnum, instruction,loc));
+//            }
+//
+//        }
+//    }
 
     public void addSymbol(SymbolEntry symbol, Pos curPos) throws AnalyzeError {
         if (this.symbolTable.get(symbol.getName()) != null) {
