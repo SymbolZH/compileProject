@@ -146,6 +146,8 @@ public final class Analyser {
 
     }
     private void analyseDeclaration() throws CompileError{
+
+
         if(check(TokenType.CONST_KW)){
             analyseConstantDeclaration();
         }
@@ -157,6 +159,10 @@ public final class Analyser {
         }
 
     }
+
+
+
+
     private void analyseLetDeclaration() throws CompileError{
         if(nextIf(TokenType.LET_KW)!=null){
             var nameToken = expect(TokenType.IDENT);
@@ -164,6 +170,7 @@ public final class Analyser {
             SymbolEntry symbol=new SymbolEntry((String)nameToken.getValue(),false,varTable.getNextVariableOffset(),SymbolKind.LET
                     ,IdentType.INT,0L);
             expect(TokenType.COLON);
+
             if(check(TokenType.DOUBLE)||check(TokenType.INT)){
                 if(nextIf(TokenType.DOUBLE)!=null){
                     type=IdentType.DOUBLE;
@@ -207,12 +214,25 @@ public final class Analyser {
     }
 
 
+    private void fun_3(int a,SymbolEntry symbol){
+        long off=symbol.getStackOffset();
+        if(a==1){
+            cuinstructions.add(new Instruction(Operation.globa,off));
+        }
+        else if(a==2){
+            cuinstructions.add(new Instruction(Operation.loca ,off));
+        }
+    }
+
 
     private void analyseConstantDeclaration() throws CompileError {
+
         if (nextIf(TokenType.CONST_KW) != null) {
             var nameToken = expect(TokenType.IDENT);
             IdentType type=null;
             expect(TokenType.COLON);
+
+            //checkSomeThing();
             if(check(TokenType.DOUBLE)||check(TokenType.INT)){
                 if(nextIf(TokenType.DOUBLE)!=null){
                     type=IdentType.DOUBLE;
@@ -221,15 +241,26 @@ public final class Analyser {
                     type=IdentType.INT;
                 }
             }
+
             expect(TokenType.ASSIGN);
             SymbolEntry symbol=new_symbol(nameToken,type);
-            long off=symbol.getStackOffset();
+
+            int judge=0;
+            if(varTable.isStart()){
+                judge=1;
+            }
+            else {
+                judge=2;
+            }
+            fun_3(judge,symbol);
+            /*long off=symbol.getStackOffset();
             if(varTable.isStart()){
                 cuinstructions.add(new Instruction(Operation.globa,off));
             }
             else{
                 cuinstructions.add(new Instruction(Operation.loca ,off));
             }
+            */
             IdentType expressionType=analyseExpression();
             cuinstructions.add(new Instruction(Operation.stroe64));
             if(expressionType!=type){
@@ -242,6 +273,8 @@ public final class Analyser {
     }
 
     private void analyseFunction() throws CompileError {
+
+
         SymbolEntry symbol=new SymbolEntry(fnTable.getNextVariableOffset());
         this.cufn=symbol;
         ArrayList<Instruction> instructions=new ArrayList<>();
@@ -305,6 +338,8 @@ public final class Analyser {
             symbol.getInstruction().add(new Instruction(Operation.ret));
         }
     }
+
+
 
     private void analyseParamList() throws CompileError{
         SymbolEntry symbol=new SymbolEntry(cufn.getParam().getNextVariableOffset());
@@ -415,6 +450,7 @@ public final class Analyser {
         cuinstructions.add(new Instruction(Operation.ret));
         expect(TokenType.SEMICOLON);
     }
+
     private Instruction[] analyseIfStatement(int offbooleanexpression) throws CompileError {
 
         expect(TokenType.IF_KW);
@@ -451,6 +487,8 @@ public final class Analyser {
         }
         return brList.toArray(new Instruction[0]);
     }
+
+
     private void analyseWhileStatement() throws CompileError {
         expect(TokenType.WHILE_KW);
         cuinstructions.add(new Instruction(Operation.br, 0L));
@@ -577,6 +615,7 @@ public final class Analyser {
         return type;
 
     }
+
     private void analyseIdentStatement() throws CompileError{
         var nameToken=expect(TokenType.IDENT);
         if(check(TokenType.L_PAREN)){
@@ -601,6 +640,21 @@ public final class Analyser {
         expect(TokenType.SEMICOLON);
     }
 
+    private void fun_tt(int a){
+        if(a==2){
+            cuinstructions.add(new Instruction(Operation.subi));
+        }
+        else if(a==1){
+            cuinstructions.add(new Instruction(Operation.subf));
+        }
+        else if(a==3){
+            cuinstructions.add(new Instruction(Operation.addf));
+        }
+        else if(a==4){
+            cuinstructions.add(new Instruction(Operation.addi));
+        }
+    }
+
     private IdentType analyseExpression() throws CompileError{
         IdentType type=analyseTerm();
         while(check(TokenType.MINUS)||check(TokenType.PLUS)){
@@ -609,28 +663,58 @@ public final class Analyser {
                 if(subtype!=type){
                     throw new Error("wrong type at"+next().getStartPos());
                 }
-                if(type==IdentType.DOUBLE){
+                int judge=0;
+                for(int i=1;i<=2;i++){
+                    if(i==1){
+                        if(type==IdentType.DOUBLE)
+                            judge=1;
+                    }
+                    if(i==2){
+                        if(type==IdentType.INT)
+                            judge=2;
+                    }
+                }
+                fun_tt(judge);
+
+                /*if(type==IdentType.DOUBLE){
                     cuinstructions.add(new Instruction(Operation.subf));
                 }
                 else if(type==IdentType.INT){
                     cuinstructions.add(new Instruction(Operation.subi));
-                }
+                }*/
             }
             else if(nextIf(TokenType.PLUS)!=null){
                 IdentType subtype=analyseTerm();
                 if(subtype!=type){
                     throw new Error("wrong type at"+next().getStartPos());
                 }
+
+
+                int judge=0;
+                for(int i=1;i<=2;i++){
+                    if(i==1){
+                        if(type==IdentType.DOUBLE)
+                            judge=3;
+                    }
+                    if(i==2){
+                        if(type==IdentType.INT)
+                            judge=4;
+                    }
+                }
+                fun_tt(judge);
+                /*
                 if(type==IdentType.DOUBLE){
                     cuinstructions.add(new Instruction(Operation.addf));
                 }
                 else if(type==IdentType.INT){
                     cuinstructions.add(new Instruction(Operation.addi));
-                }
+                }*/
             }
         }
         return type;
     }
+
+
     private IdentType analyseTerm() throws CompileError {
         IdentType type=analyseFactor();
         while(check(TokenType.MUL)||check(TokenType.DIV)){
