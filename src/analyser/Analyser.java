@@ -765,12 +765,15 @@ public final class Analyser {
         if(nameToken.getValue().equals("putint")||nameToken.getValue().equals("putdouble")
                 ||nameToken.getValue().equals("putchar")||nameToken.getValue().equals("putstr"))
             return 1;
-        else if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getdouble")||nameToken.getValue().equals("getchar")){
-            return 2;
-        }
+
         else if(nameToken.getValue().equals("putln")){
             return 3;
         }
+        
+        else if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getdouble")||nameToken.getValue().equals("getchar")){
+            return 2;
+        }
+
         else {
             return 4;
         }
