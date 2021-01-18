@@ -22,32 +22,14 @@ public class Instruction {
         this.x = 0;
     }
 
-    public boolean first_judge(Object o){
-        if(this == o)
-            return true;
-        return false;
-    }
-    public int is_equal(Object o){
-        if(first_judge(o)==true)
-            return 1;
-        if (o == null || getClass() != o.getClass())
-            return 2;
-        return 3;
-
-    }
-
     @Override
     public boolean equals(Object o) {
-        if(is_equal(o)==1){
+        if (this == o)
             return true;
-        }
-        else if (is_equal(o)==2){
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
-        else {
-            Instruction that = (Instruction) o;
-            return opt == that.opt && Objects.equals(x, that.x);
-        }
+        Instruction that = (Instruction) o;
+        return opt == that.opt && Objects.equals(x, that.x);
     }
 
     @Override
@@ -70,7 +52,7 @@ public class Instruction {
     public void setX(Integer x) {
         this.x = x;
     }
-//    nop,pop,stroe8,load8,addi, subi,muli,divi,ret,cmpi,
+    //    nop,pop,stroe8,load8,addi, subi,muli,divi,ret,cmpi,
 //    push,globa,loca, arga,br,brfalse,brtrue, call,
     public byte[] toByte() {
 
