@@ -1,6 +1,7 @@
 package tokenizer;
 
 public enum TokenType {
+
     /** 空 */
     None,
     FN_KW     ,//-> 'fn'

@@ -15,6 +15,7 @@ public class StringIter {
     // 以行为基础的缓冲区
     ArrayList<String> linesBuffer = new ArrayList<>();
 
+
     Scanner scanner;
     // 指向下一个要读取的字符
     Pos ptrNext = new Pos(0, 0);

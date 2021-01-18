@@ -779,23 +779,33 @@ public final class Analyser {
             cuinstructions.add(new Instruction(Operation.stackalloc, 1L));
             cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
         }
+        else if(a==4){
+            cuinstructions.add(new Instruction(Operation.call,entry.getStackOffset()));
+        }
         else if(a==3){
             cuinstructions.add(new Instruction(Operation.stackalloc, 0L));
             cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
         }
+        else if(a==1){
+            cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
+        }
     }
 
-    private void set_type(int a,IdentType type,Token nameToken){
+    private IdentType set_type(int a,Token nameToken){
         if(a==2) {
             if (nameToken.getValue().equals("getint") || nameToken.getValue().equals("getchar")) {
-                type = IdentType.INT;
+                return IdentType.INT;
             } else if (nameToken.getValue().equals("getdouble")) {
-                type = IdentType.DOUBLE;
+                return IdentType.DOUBLE;
             }
         }
         else if(a==3){
-            type=IdentType.VOID;
+            return IdentType.VOID;
         }
+        else if(a==1){
+            return IdentType.VOID;
+        }
+        return null;
     }
 
     private IdentType analysefn(Token nameToken) throws CompileError {
@@ -809,35 +819,39 @@ public final class Analyser {
                 analyseExpression();
             }
             expect(TokenType.R_PAREN);
+            cuin_fun(1,entry);
 
-            cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
-            type=IdentType.VOID;
+            //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
+            //type=IdentType.VOID;
+            type=set_type(1,nameToken);
         }
         else if(get_id(nameToken)==2){
             SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
             expect(TokenType.L_PAREN);
             expect(TokenType.R_PAREN);
             cuin_fun(2,entry);
+            type=set_type(2,nameToken);
             //set_type(1,type,nameToken);
             //cuinstructions.add(new Instruction(Operation.stackalloc, 1L));
             //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
+            /*
 
             if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getchar")){
                 type=IdentType.INT;
             }
             else if(nameToken.getValue().equals("getdouble")){
                 type=IdentType.DOUBLE;
-            }
+            }*/
         }
         else if(get_id(nameToken)==3){
             SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
             expect(TokenType.L_PAREN);
             expect(TokenType.R_PAREN);
             cuin_fun(3,entry);
-            //set_type(3,type,nameToken);
+            type=set_type(3,nameToken);
             //cuinstructions.add(new Instruction(Operation.stackalloc, 0L));
             //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
-            type=IdentType.VOID;
+            //type=IdentType.VOID;
         }
         else{
             SymbolEntry entry=fnTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
@@ -852,11 +866,13 @@ public final class Analyser {
                 }
             }
             expect(TokenType.R_PAREN);
-            cuinstructions.add(new Instruction(Operation.call,entry.getStackOffset()));
+            cuin_fun(4,entry);
+            //cuinstructions.add(new Instruction(Operation.call,entry.getStackOffset()));
             type=entry.getType();
         }
         return type;
     }
+    
     private SymbolEntry getvar(Token nameToken) throws AnalyzeError {
         SymbolEntry entry=varTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
         if(entry==null){
