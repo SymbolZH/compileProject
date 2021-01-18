@@ -24,21 +24,16 @@ public final class Analyser {
     Token peekedToken = null;
 
     public void Analyser_init(Tokenizer tokenizer){
+
+    }
+
+    public Analyser(Tokenizer tokenizer) throws AnalyzeError {
         this.tokenizer = tokenizer;
         this.cuinstructions=new ArrayList<>();
         this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
                 IdentType.VOID,null,null,0,this.cuinstructions,null);
 
-    }
-
-    public Analyser(Tokenizer tokenizer) throws AnalyzeError {
-        /*this.tokenizer = tokenizer;
-        this.cuinstructions=new ArrayList<>();
-        this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
-                IdentType.VOID,null,null,0,this.cuinstructions,null);
-
-        */
-        Analyser_init(tokenizer);
+        //Analyser_init(tokenizer);
         fnTable.addSymbol(_start,null);
         for(String lib:libs){
             globalTable.addSymbol(new SymbolEntry(lib,true,globalTable.getNextVariableOffset(),SymbolKind.CONST,IdentType.STRING,lib),null);
@@ -117,8 +112,8 @@ public final class Analyser {
         var token = peek();
         if(check_token(token.getTokenType(),tt)){
             return next();
-        }
-        throw new ExpectedTokenError(tt, token);
+        }else
+            throw new ExpectedTokenError(tt, token);
         /*if (token.getTokenType() == tt) {
             return next();
         } else {
