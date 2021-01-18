@@ -122,7 +122,23 @@ public final class Analyser {
      * <程序> ::= 'begin'<主过程>'end'
      */
     private void analyseProgram() throws CompileError {
-        analyseMain();
+        while (true){
+            if(check(TokenType.CONST_KW)||check(TokenType.LET_KW) ){
+                analyseDeclaration();
+            }
+            else{
+                break;
+            }
+        }
+        while (true){
+            if(check(TokenType.FN_KW)){
+                analyseFunction();
+            }
+            else {
+                break;
+            }
+        }
+        //analyseMain();
         expect(TokenType.EOF);
     }
 
@@ -190,6 +206,14 @@ public final class Analyser {
             varTable.addSymbol(symbol,nameToken.getStartPos());
         }
     }
+
+    private SymbolEntry new_symbol(Token nameToken,IdentType type){
+        return new SymbolEntry((String)nameToken.getValue(),true,varTable.getNextVariableOffset(),SymbolKind.CONST
+                ,type,0L);
+    }
+
+
+
     private void analyseConstantDeclaration() throws CompileError {
         if (nextIf(TokenType.CONST_KW) != null) {
             var nameToken = expect(TokenType.IDENT);
@@ -204,8 +228,7 @@ public final class Analyser {
                 }
             }
             expect(TokenType.ASSIGN);
-            SymbolEntry symbol=new SymbolEntry((String)nameToken.getValue(),true,varTable.getNextVariableOffset(),SymbolKind.CONST
-                    ,type,0L);
+            SymbolEntry symbol=new_symbol(nameToken,type);
             long off=symbol.getStackOffset();
             if(varTable.isStart()){
                 cuinstructions.add(new Instruction(Operation.globa,off));
@@ -616,7 +639,6 @@ public final class Analyser {
             }
         }
         return type;
-        //throw new Error("Not implemented");
     }
     private IdentType analyseTerm() throws CompileError {
         IdentType type=analyseFactor();
@@ -727,8 +749,8 @@ public final class Analyser {
             }
         }
         return type;
-        //throw new Error("Not implemented");
     }
+
     private IdentType analysefn(Token nameToken) throws CompileError {
         IdentType type=null;
         if(nameToken.getValue().equals("putint")||nameToken.getValue().equals("putdouble")
