@@ -17,8 +17,7 @@ public final class Analyser {
     private SymbolTable fnTable=_startTable;
     private SymbolTable varTable=globalTable;
     private SymbolTable paraTable =null;
-    int stack=0;
-    int stackTop=0;
+
     List <String> libs=Arrays.asList("getint","getdouble","getchar","putint","putdouble","putchar","putstr","putln");
     /** 当前偷看的 token */
     Token peekedToken = null;
@@ -32,11 +31,6 @@ public final class Analyser {
 
     public Analyser(Tokenizer tokenizer) throws AnalyzeError {
         analyserInit(tokenizer);
-        /*this.tokenizer = tokenizer;
-        this.cuinstructions=new ArrayList<>();
-        this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
-                IdentType.VOID,null,null,0,this.cuinstructions,null);
-        */
         fnTable.addSymbol(_start,null);
         for(String lib:libs){
             globalTable.addSymbol(new SymbolEntry(lib,true,globalTable.getNextVariableOffset(),SymbolKind.CONST,IdentType.STRING,lib),null);
@@ -769,7 +763,7 @@ public final class Analyser {
         else if(nameToken.getValue().equals("putln")){
             return 3;
         }
-        
+
         else if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getdouble")||nameToken.getValue().equals("getchar")){
             return 2;
         }
@@ -780,13 +774,35 @@ public final class Analyser {
 
     }
 
+    private void cuin_fun(int a,SymbolEntry entry){
+        if(a==2){
+            cuinstructions.add(new Instruction(Operation.stackalloc, 1L));
+            cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
+        }
+        else if(a==3){
+            cuinstructions.add(new Instruction(Operation.stackalloc, 0L));
+            cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
+        }
+    }
+
+    private void set_type(int a,IdentType type,Token nameToken){
+        if(a==2) {
+            if (nameToken.getValue().equals("getint") || nameToken.getValue().equals("getchar")) {
+                type = IdentType.INT;
+            } else if (nameToken.getValue().equals("getdouble")) {
+                type = IdentType.DOUBLE;
+            }
+        }
+        else if(a==3){
+            type=IdentType.VOID;
+        }
+    }
+
     private IdentType analysefn(Token nameToken) throws CompileError {
         IdentType type=null;
         if(get_id(nameToken)==1){
             SymbolEntry entry=add_symbol(nameToken);
-            //SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
-            //cuinstructions.add(new Instruction(Operation.stackalloc,0L));
-            //expect(TokenType.L_PAREN);
+
             mixture(nameToken);
             if (check(TokenType.MINUS) || check(TokenType.IDENT) || check(TokenType.L_PAREN)
                     || check(TokenType.UINT_LITERAL) || check(TokenType.STRING_LITERAL)||check(TokenType.DOUBLE_LITERAL)) {
@@ -801,22 +817,27 @@ public final class Analyser {
             SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
             expect(TokenType.L_PAREN);
             expect(TokenType.R_PAREN);
-            cuinstructions.add(new Instruction(Operation.stackalloc, 1L));
-            cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
+            cuin_fun(2,entry);
+            set_type(1,type,nameToken);
+            //cuinstructions.add(new Instruction(Operation.stackalloc, 1L));
+            //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
+/*
             if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getchar")){
                 type=IdentType.INT;
             }
             else if(nameToken.getValue().equals("getdouble")){
                 type=IdentType.DOUBLE;
-            }
+            }*/
         }
         else if(get_id(nameToken)==3){
             SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
             expect(TokenType.L_PAREN);
             expect(TokenType.R_PAREN);
-            cuinstructions.add(new Instruction(Operation.stackalloc, 0L));
-            cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
-            type=IdentType.VOID;
+            cuin_fun(3,entry);
+            set_type(3,type,nameToken);
+            //cuinstructions.add(new Instruction(Operation.stackalloc, 0L));
+            //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
+            //type=IdentType.VOID;
         }
         else{
             SymbolEntry entry=fnTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
