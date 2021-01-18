@@ -340,7 +340,7 @@ public final class Analyser {
         expect(TokenType.L_BRACE);
         while(check(TokenType.IF_KW)||check(TokenType.WHILE_KW)||check(TokenType.RETURN_KW)
                 ||check(TokenType.SEMICOLON)||check(TokenType.MINUS)||check(TokenType.IDENT)
-                ||check(TokenType.LET_KW)||check(TokenType.CONST_KW)||check(TokenType.CONTINUE_KW)||check(TokenType.BREAK_KW)) {
+                ||check(TokenType.LET_KW)||check(TokenType.CONST_KW)) {
             Instruction[]br=analyseStatement(offbooleanexpression);
             if(br!=null){
                 brList.addAll(Arrays.asList(br));
@@ -377,16 +377,13 @@ public final class Analyser {
                 analyseContinueStatement(offbooleanexpression);
                 return null;
             }
-            else if(check(TokenType.BREAK_KW)){
-                return new Instruction[]{analyseBreakStatement()};
-            }
+
             else{
                 throw new ExpectedTokenError(List.of(TokenType.IF_KW,TokenType.WHILE_KW,TokenType.RETURN_KW,
                         TokenType.SEMICOLON,TokenType.IDENT, TokenType.LET_KW,TokenType.CONST_KW,TokenType.CONTINUE_KW,TokenType.BREAK_KW),next());
             }
     }
     private Instruction analyseBreakStatement() throws CompileError {
-        expect(TokenType.BREAK_KW);
         expect(TokenType.SEMICOLON);
         Instruction br=new Instruction(Operation.br);
         cuinstructions.add(br);
@@ -893,31 +890,7 @@ public final class Analyser {
             }
         }
         cuin_change(cal,entry);
-        /*if(entry==null){
-            entry=cufn.getParam().getsymbol(nameToken.getValue(),nameToken.getStartPos());
-            if(entry==null){
-                entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
-                if(entry==null){
-                    throw new AnalyzeError(ErrorCode.NotDeclared,nameToken.getStartPos());
-                }
-                else{
-                    cuin_change(1,entry);
-                    //cuinstructions.add(new Instruction(Operation.globa,entry.stackOffset));
-                }
-            }
-            else{
-                if(cufn.getType()==IdentType.VOID){
-                    cuinstructions.add(new Instruction(Operation.arga,entry.stackOffset));
-                }
-                else{
-                    cuinstructions.add(new Instruction(Operation.arga,entry.stackOffset+1));
-                }
-            }
-        }
-        else{
-            cuin_change(3,entry);
-            //cuinstructions.add(new Instruction(Operation.loca,entry.stackOffset));
-        }*/
+
         return entry;
     }
 
