@@ -818,26 +818,26 @@ public final class Analyser {
             expect(TokenType.L_PAREN);
             expect(TokenType.R_PAREN);
             cuin_fun(2,entry);
-            set_type(1,type,nameToken);
+            //set_type(1,type,nameToken);
             //cuinstructions.add(new Instruction(Operation.stackalloc, 1L));
             //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
-/*
+
             if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getchar")){
                 type=IdentType.INT;
             }
             else if(nameToken.getValue().equals("getdouble")){
                 type=IdentType.DOUBLE;
-            }*/
+            }
         }
         else if(get_id(nameToken)==3){
             SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
             expect(TokenType.L_PAREN);
             expect(TokenType.R_PAREN);
             cuin_fun(3,entry);
-            set_type(3,type,nameToken);
+            //set_type(3,type,nameToken);
             //cuinstructions.add(new Instruction(Operation.stackalloc, 0L));
             //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
-            //type=IdentType.VOID;
+            type=IdentType.VOID;
         }
         else{
             SymbolEntry entry=fnTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
