@@ -751,14 +751,40 @@ public final class Analyser {
         return type;
     }
 
+    private SymbolEntry add_symbol(Token nameToken)throws CompileError{
+        return globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
+    }
+
+    private void mixture(Token nameToken)throws CompileError{
+        //SymbolEntry entry=add_symbol(nameToken);
+        cuinstructions.add(new Instruction(Operation.stackalloc,0L));
+        expect(TokenType.L_PAREN);
+    }
+
+    private int get_id(Token nameToken){
+        if(nameToken.getValue().equals("putint")||nameToken.getValue().equals("putdouble")
+                ||nameToken.getValue().equals("putchar")||nameToken.getValue().equals("putstr"))
+            return 1;
+        else if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getdouble")||nameToken.getValue().equals("getchar")){
+            return 2;
+        }
+        else if(nameToken.getValue().equals("putln")){
+            return 3;
+        }
+        else {
+            return 4;
+        }
+
+    }
+
     private IdentType analysefn(Token nameToken) throws CompileError {
         IdentType type=null;
-        if(nameToken.getValue().equals("putint")||nameToken.getValue().equals("putdouble")
-                ||nameToken.getValue().equals("putchar")||nameToken.getValue().equals("putstr")){
-
-            SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
-            cuinstructions.add(new Instruction(Operation.stackalloc,0L));
-            expect(TokenType.L_PAREN);
+        if(get_id(nameToken)==1){
+            SymbolEntry entry=add_symbol(nameToken);
+            //SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
+            //cuinstructions.add(new Instruction(Operation.stackalloc,0L));
+            //expect(TokenType.L_PAREN);
+            mixture(nameToken);
             if (check(TokenType.MINUS) || check(TokenType.IDENT) || check(TokenType.L_PAREN)
                     || check(TokenType.UINT_LITERAL) || check(TokenType.STRING_LITERAL)||check(TokenType.DOUBLE_LITERAL)) {
                 analyseExpression();
@@ -768,7 +794,7 @@ public final class Analyser {
             cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
             type=IdentType.VOID;
         }
-        else if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getdouble")||nameToken.getValue().equals("getchar")){
+        else if(get_id(nameToken)==2){
             SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
             expect(TokenType.L_PAREN);
             expect(TokenType.R_PAREN);
@@ -781,7 +807,7 @@ public final class Analyser {
                 type=IdentType.DOUBLE;
             }
         }
-        else if(nameToken.getValue().equals("putln")){
+        else if(get_id(nameToken)==3){
             SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
             expect(TokenType.L_PAREN);
             expect(TokenType.R_PAREN);
