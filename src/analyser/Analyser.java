@@ -572,9 +572,7 @@ public final class Analyser {
             if(type==IdentType.INT){
                 cuinstructions.add(new Instruction(Operation.cmpi));
             }
-            else if(type==IdentType.DOUBLE){
-                cuinstructions.add(new Instruction(Operation.cmpf));
-            }
+
             cuinstructions.add(new Instruction(Operation.setgt));
             cuinstructions.add(new Instruction(Operation.brtrue, 1L));
             if(subtype!=type){
@@ -588,9 +586,7 @@ public final class Analyser {
             if(type==IdentType.INT){
                 cuinstructions.add(new Instruction(Operation.cmpi));
             }
-            else if(type==IdentType.DOUBLE){
-                cuinstructions.add(new Instruction(Operation.cmpf));
-            }
+
             cuinstructions.add(new Instruction(Operation.brtrue, 1L));
             if(subtype!=type){
                 throw new Error("wrong type at"+next().getStartPos());
@@ -603,9 +599,7 @@ public final class Analyser {
             if(type==IdentType.INT){
                 cuinstructions.add(new Instruction(Operation.cmpi));
             }
-            else if(type==IdentType.DOUBLE){
-                cuinstructions.add(new Instruction(Operation.cmpf));
-            }
+
             cuinstructions.add(new Instruction(Operation.brfalse, 1L));
             if(subtype!=type){
                 throw new Error("wrong type at"+next().getStartPos());
@@ -830,15 +824,11 @@ public final class Analyser {
             }
         } else if (check(TokenType.UINT_LITERAL)) {
             var nameToken=next();
+
             cuinstructions.add(new Instruction(Operation.push,(Long) nameToken.getValue()));
             type=IdentType.INT;
 
-        } else if (check(TokenType.DOUBLE_LITERAL)) {
-            var nameToken=next();
-            cuinstructions.add(new Instruction(Operation.push,(Long) nameToken.getValue()));
-            type=IdentType.DOUBLE;
-            // 调用相应的处理函数
-        }else if(check(TokenType.STRING_LITERAL)){
+        } else if(check(TokenType.STRING_LITERAL)){
             var nameToken=next();
             SymbolEntry symbol=new SymbolEntry((String)nameToken.getValue(),true,globalTable.getNextVariableOffset(),SymbolKind.CONST
                     ,IdentType.STRING,nameToken.getValue());
