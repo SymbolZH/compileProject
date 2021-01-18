@@ -292,9 +292,12 @@ public class Tokenizer {
 //    SEMICOLO, //-> ';'
 
 
+
+
     private Token lexOperatorOrUnknown() throws TokenizeError {
         char ch=it.nextChar();
         Pos prePos=it.previousPos();
+
         if(ch=='+'){
             return new Token(TokenType.PLUS, '+', it.previousPos(), it.currentPos());
         }
@@ -382,6 +385,9 @@ public class Tokenizer {
         else{
             throw new TokenizeError(ErrorCode.InvalidInput, it.previousPos());
         }
+
+
+
     }
 
     private void skipSpaceCharacters() {

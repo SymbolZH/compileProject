@@ -23,11 +23,21 @@ public final class Analyser {
     /** 当前偷看的 token */
     Token peekedToken = null;
 
-    public Analyser(Tokenizer tokenizer) throws AnalyzeError {
+    public void Analyser_init(){
         this.tokenizer = tokenizer;
         this.cuinstructions=new ArrayList<>();
         this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
                 IdentType.VOID,null,null,0,this.cuinstructions,null);
+
+    }
+
+    public Analyser(Tokenizer tokenizer) throws AnalyzeError {
+        /*this.tokenizer = tokenizer;
+        this.cuinstructions=new ArrayList<>();
+        this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
+                IdentType.VOID,null,null,0,this.cuinstructions,null);
+        */
+        Analyser_init();
         fnTable.addSymbol(_start,null);
         for(String lib:libs){
             globalTable.addSymbol(new SymbolEntry(lib,true,globalTable.getNextVariableOffset(),SymbolKind.CONST,IdentType.STRING,lib),null);
@@ -99,13 +109,20 @@ public final class Analyser {
      * @throws CompileError 如果类型不匹配
      */
 
+    private boolean check_token(TokenType a,TokenType b){
+        return a==b;
+    }
     private Token expect(TokenType tt) throws CompileError {
         var token = peek();
-        if (token.getTokenType() == tt) {
+        if(check_token(token.getTokenType(),tt)){
+            return next();
+        }
+        throw new ExpectedTokenError(tt, token);
+        /*if (token.getTokenType() == tt) {
             return next();
         } else {
             throw new ExpectedTokenError(tt, token);
-        }
+        }*/
     }
 
 
@@ -113,11 +130,17 @@ public final class Analyser {
      * <程序> ::= 'begin'<主过程>'end'
      */
     private void analyseProgram() throws CompileError {
-        analyseMain();
+        while(check(TokenType.CONST_KW)||check(TokenType.LET_KW) ){
+            analyseDeclaration();
+        }
+        while (check(TokenType.FN_KW)) {
+            analyseFunction();
+        }
         expect(TokenType.EOF);
     }
 
     private void analyseMain() throws CompileError {
+
         while(check(TokenType.CONST_KW)||check(TokenType.LET_KW) ){
             analyseDeclaration();
         }
@@ -127,6 +150,7 @@ public final class Analyser {
 
     }
     private void analyseDeclaration() throws CompileError{
+
         if(check(TokenType.CONST_KW)){
             analyseConstantDeclaration();
         }
@@ -181,7 +205,10 @@ public final class Analyser {
             varTable.addSymbol(symbol,nameToken.getStartPos());
         }
     }
+
+
     private void analyseConstantDeclaration() throws CompileError {
+
         if (nextIf(TokenType.CONST_KW) != null) {
             var nameToken = expect(TokenType.IDENT);
             IdentType type=null;
@@ -195,8 +222,10 @@ public final class Analyser {
                 }
             }
             expect(TokenType.ASSIGN);
+
             SymbolEntry symbol=new SymbolEntry((String)nameToken.getValue(),true,varTable.getNextVariableOffset(),SymbolKind.CONST
                     ,type,0L);
+
             long off=symbol.getStackOffset();
             if(varTable.isStart()){
                 cuinstructions.add(new Instruction(Operation.globa,off));
@@ -214,6 +243,8 @@ public final class Analyser {
             varTable.addSymbol(symbol,nameToken.getStartPos());
         }
     }
+
+
 
     private void analyseFunction() throws CompileError {
         SymbolEntry symbol=new SymbolEntry(fnTable.getNextVariableOffset());
@@ -278,6 +309,8 @@ public final class Analyser {
         if(symbol.getType()==IdentType.VOID||symbol.getInstruction().get(symbol.getInstruction().size()-1).getOpt()!=Operation.ret){
             symbol.getInstruction().add(new Instruction(Operation.ret));
         }
+
+
     }
 
     private void analyseParamList() throws CompileError{
