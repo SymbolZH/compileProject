@@ -715,24 +715,82 @@ public final class Analyser {
     }
 
 
+    private void fun_24(int a){
+        if(a==1){
+            cuinstructions.add(new Instruction(Operation.mulf));
+        }
+        else if(a==2){
+            cuinstructions.add(new Instruction(Operation.muli));
+        }
+        else if(a==3){
+            cuinstructions.add(new Instruction(Operation.divf));
+        }
+        else if(a==4){
+            cuinstructions.add(new Instruction(Operation.divi));
+        }
+
+    }
+
+
+
     private IdentType analyseTerm() throws CompileError {
         IdentType type=analyseFactor();
+
+
         while(check(TokenType.MUL)||check(TokenType.DIV)){
             if(nextIf(TokenType.MUL)!=null){
                 IdentType subtype=analyseFactor();
+
+                for(int i=0;i<=2;i++){
+                    if(i==0){
+                        if(subtype!=type){
+                            throw new Error("wrong type at"+next().getStartPos());
+                        }
+                    }
+                    else if(i==1){
+                        if(type==IdentType.DOUBLE){
+                            fun_24(i);
+                        }
+                    }
+                    else if(i==2){
+                        if(type==IdentType.INT){
+                            fun_24(i);
+                        }
+                    }
+                }
+                /*
                 if(subtype!=type){
                     throw new Error("wrong type at"+next().getStartPos());
                 }
+
                 if(type==IdentType.DOUBLE){
                     cuinstructions.add(new Instruction(Operation.mulf));
                 }
                 else if(type==IdentType.INT){
                     cuinstructions.add(new Instruction(Operation.muli));
-                }
+                }*/
             }
             else if(nextIf(TokenType.DIV)!=null){
                 IdentType subtype=analyseFactor();
-                if(subtype!=type){
+                for(int i=0;i<=2;i++){
+                    if(i==0){
+                        if(subtype!=type){
+                            throw new Error("wrong type at"+next().getStartPos());
+                        }
+                    }
+                    else if(i==1){
+                        if(type==IdentType.DOUBLE){
+                            fun_24(i+2);
+                        }
+                    }
+                    else if(i==2){
+                        if(type==IdentType.INT){
+                            fun_24(i+2);
+                        }
+                    }
+                }
+
+                /*if(subtype!=type){
                     throw new Error("wrong type at"+next().getStartPos());
                 }
                 if(type==IdentType.DOUBLE){
@@ -740,11 +798,10 @@ public final class Analyser {
                 }
                 else if(type==IdentType.INT){
                     cuinstructions.add(new Instruction(Operation.divi));
-                }
+                }*/
             }
         }
         return type;
-        //throw new Error("Not implemented");
     }
 
     private IdentType analyseFactor() throws CompileError {
