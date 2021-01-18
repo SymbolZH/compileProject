@@ -821,8 +821,6 @@ public final class Analyser {
             expect(TokenType.R_PAREN);
             cuin_fun(1,entry);
 
-            //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
-            //type=IdentType.VOID;
             type=set_type(1,nameToken);
         }
         else if(get_id(nameToken)==2){
@@ -831,17 +829,6 @@ public final class Analyser {
             expect(TokenType.R_PAREN);
             cuin_fun(2,entry);
             type=set_type(2,nameToken);
-            //set_type(1,type,nameToken);
-            //cuinstructions.add(new Instruction(Operation.stackalloc, 1L));
-            //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
-            /*
-
-            if(nameToken.getValue().equals("getint")||nameToken.getValue().equals("getchar")){
-                type=IdentType.INT;
-            }
-            else if(nameToken.getValue().equals("getdouble")){
-                type=IdentType.DOUBLE;
-            }*/
         }
         else if(get_id(nameToken)==3){
             SymbolEntry entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
@@ -849,9 +836,6 @@ public final class Analyser {
             expect(TokenType.R_PAREN);
             cuin_fun(3,entry);
             type=set_type(3,nameToken);
-            //cuinstructions.add(new Instruction(Operation.stackalloc, 0L));
-            //cuinstructions.add(new Instruction(Operation.callname,entry.getStackOffset()));
-            //type=IdentType.VOID;
         }
         else{
             SymbolEntry entry=fnTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
@@ -867,15 +851,49 @@ public final class Analyser {
             }
             expect(TokenType.R_PAREN);
             cuin_fun(4,entry);
-            //cuinstructions.add(new Instruction(Operation.call,entry.getStackOffset()));
             type=entry.getType();
         }
         return type;
     }
-    
+
+    private void cuin_change(int a,SymbolEntry entry){
+        if(a==1){
+            if(cufn.getType()==IdentType.VOID){
+                cuinstructions.add(new Instruction(Operation.arga,entry.stackOffset));
+            }
+            else{
+                cuinstructions.add(new Instruction(Operation.arga,entry.stackOffset+1));
+            }
+        }
+        else if(a==2){
+            cuinstructions.add(new Instruction(Operation.globa,entry.stackOffset));
+        }
+        else if(a==0){
+            cuinstructions.add(new Instruction(Operation.loca,entry.stackOffset));
+        }
+    }
+
     private SymbolEntry getvar(Token nameToken) throws AnalyzeError {
         SymbolEntry entry=varTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
-        if(entry==null){
+
+        int cal=0;
+        while (entry==null){
+            if(cal==0){
+                entry=cufn.getParam().getsymbol(nameToken.getValue(),nameToken.getStartPos());
+                cal++;
+                continue;
+            }
+            else if(cal==1){
+                entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
+                cal++;
+                continue;
+            }
+            else if(cal==2){
+                throw new AnalyzeError(ErrorCode.NotDeclared,nameToken.getStartPos());
+            }
+        }
+        cuin_change(cal,entry);
+        /*if(entry==null){
             entry=cufn.getParam().getsymbol(nameToken.getValue(),nameToken.getStartPos());
             if(entry==null){
                 entry=globalTable.getsymbol(nameToken.getValue(),nameToken.getStartPos());
@@ -883,7 +901,8 @@ public final class Analyser {
                     throw new AnalyzeError(ErrorCode.NotDeclared,nameToken.getStartPos());
                 }
                 else{
-                    cuinstructions.add(new Instruction(Operation.globa,entry.stackOffset));
+                    cuin_change(1,entry);
+                    //cuinstructions.add(new Instruction(Operation.globa,entry.stackOffset));
                 }
             }
             else{
@@ -896,8 +915,9 @@ public final class Analyser {
             }
         }
         else{
-            cuinstructions.add(new Instruction(Operation.loca,entry.stackOffset));
-        }
+            cuin_change(3,entry);
+            //cuinstructions.add(new Instruction(Operation.loca,entry.stackOffset));
+        }*/
         return entry;
     }
 
