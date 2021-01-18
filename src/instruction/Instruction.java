@@ -22,14 +22,37 @@ public class Instruction {
         this.x = 0;
     }
 
+    public int judge(Object o){
+        if(this== o){
+            return 1;
+        }
+        if(o == null || getClass() != o.getClass()){
+            return 2;
+        }
+        return 3;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        int tmp=judge(o);
+        switch (tmp){
+            case 1:{
+                return true;
+            }
+            case 2:{
+                return false;
+            }
+            default:{
+                Instruction that = (Instruction) o;
+                return opt == that.opt && Objects.equals(x, that.x);
+            }
+        }
+        /*if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
         Instruction that = (Instruction) o;
-        return opt == that.opt && Objects.equals(x, that.x);
+        return opt == that.opt && Objects.equals(x, that.x);*/
     }
 
     @Override

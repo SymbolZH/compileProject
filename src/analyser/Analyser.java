@@ -23,11 +23,20 @@ public final class Analyser {
     /** 当前偷看的 token */
     Token peekedToken = null;
 
-    public Analyser(Tokenizer tokenizer) throws AnalyzeError {
+    public void analyserInit(Tokenizer tokenizer){
         this.tokenizer = tokenizer;
         this.cuinstructions=new ArrayList<>();
         this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
                 IdentType.VOID,null,null,0,this.cuinstructions,null);
+    }
+
+    public Analyser(Tokenizer tokenizer) throws AnalyzeError {
+        analyserInit(tokenizer);
+        /*this.tokenizer = tokenizer;
+        this.cuinstructions=new ArrayList<>();
+        this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
+                IdentType.VOID,null,null,0,this.cuinstructions,null);
+        */
         fnTable.addSymbol(_start,null);
         for(String lib:libs){
             globalTable.addSymbol(new SymbolEntry(lib,true,globalTable.getNextVariableOffset(),SymbolKind.CONST,IdentType.STRING,lib),null);
