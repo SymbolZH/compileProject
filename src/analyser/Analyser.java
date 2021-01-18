@@ -315,9 +315,6 @@ public final class Analyser {
         else if(nextIf(TokenType.VOID)!=null){
             type=IdentType.VOID;
         }
-        else if(nextIf(TokenType.DOUBLE)!=null){
-            type=IdentType.DOUBLE;
-        }
         else{
             throw new ExpectedTokenError(List.of(TokenType.INT,TokenType.VOID), next());
         }
@@ -326,9 +323,6 @@ public final class Analyser {
             this.main=symbol;
             if(symbol.getType()==IdentType.VOID){
                 _start.getInstruction().add(new Instruction(Operation.stackalloc, 0L));
-            }
-            else if(symbol.getType()==IdentType.INT||symbol.getType()==IdentType.DOUBLE){
-                _start.getInstruction().add(new Instruction(Operation.stackalloc,1L));
             }
             _start.getInstruction().add(new Instruction(Operation.call,symbol.getStackOffset()));
         }
@@ -524,9 +518,6 @@ public final class Analyser {
             if(type==IdentType.INT){
                 cuinstructions.add(new Instruction(Operation.cmpi));
             }
-            else if(type==IdentType.DOUBLE){
-                cuinstructions.add(new Instruction(Operation.cmpf));
-            }
             cuinstructions.add(new Instruction(Operation.setlt));
             cuinstructions.add(new Instruction(Operation.brtrue, 1L));
             if(subtype!=type){
@@ -539,9 +530,6 @@ public final class Analyser {
             subtype=analyseExpression();
             if(type==IdentType.INT){
                 cuinstructions.add(new Instruction(Operation.cmpi));
-            }
-            else if(type==IdentType.DOUBLE){
-                cuinstructions.add(new Instruction(Operation.cmpf));
             }
             cuinstructions.add(new Instruction(Operation.setgt));
             cuinstructions.add(new Instruction(Operation.brfalse, 1L));
@@ -802,6 +790,7 @@ public final class Analyser {
             }
         }
         return type;
+        //throw new Error("Not implemented");
     }
 
     private IdentType analyseFactor() throws CompileError {
