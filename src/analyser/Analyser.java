@@ -23,7 +23,7 @@ public final class Analyser {
     /** 当前偷看的 token */
     Token peekedToken = null;
 
-    public void Analyser_init(){
+    public void Analyser_init(Tokenizer tokenizer){
         this.tokenizer = tokenizer;
         this.cuinstructions=new ArrayList<>();
         this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
@@ -36,8 +36,9 @@ public final class Analyser {
         this.cuinstructions=new ArrayList<>();
         this._start=new SymbolEntry(null,false,fnTable.getNextVariableOffset(),SymbolKind.FN,
                 IdentType.VOID,null,null,0,this.cuinstructions,null);
+
         */
-        Analyser_init();
+        Analyser_init(tokenizer);
         fnTable.addSymbol(_start,null);
         for(String lib:libs){
             globalTable.addSymbol(new SymbolEntry(lib,true,globalTable.getNextVariableOffset(),SymbolKind.CONST,IdentType.STRING,lib),null);
@@ -104,7 +105,7 @@ public final class Analyser {
     /**
      * 如果下一个 token 的类型是 tt，则前进一个 token 并返回，否则抛出异常
      * 
-     * @param tt 类型
+     * @param
      * @return 这个 token
      * @throws CompileError 如果类型不匹配
      */
@@ -206,6 +207,11 @@ public final class Analyser {
         }
     }
 
+    private SymbolEntry new_symbol(IdentType type,Token nameToken){
+        //var nameToken= expect(TokenType.IDENT);
+        return new SymbolEntry((String)nameToken.getValue(),true,varTable.getNextVariableOffset(),SymbolKind.CONST
+                ,type,0L);
+    }
 
     private void analyseConstantDeclaration() throws CompileError {
 
@@ -213,6 +219,8 @@ public final class Analyser {
             var nameToken = expect(TokenType.IDENT);
             IdentType type=null;
             expect(TokenType.COLON);
+
+
             if(check(TokenType.DOUBLE)||check(TokenType.INT)){
                 if(nextIf(TokenType.DOUBLE)!=null){
                     type=IdentType.DOUBLE;
@@ -223,8 +231,10 @@ public final class Analyser {
             }
             expect(TokenType.ASSIGN);
 
-            SymbolEntry symbol=new SymbolEntry((String)nameToken.getValue(),true,varTable.getNextVariableOffset(),SymbolKind.CONST
-                    ,type,0L);
+            SymbolEntry symbol=new_symbol(type,nameToken);
+
+            //SymbolEntry symbol=new SymbolEntry((String)nameToken.getValue(),true,varTable.getNextVariableOffset(),SymbolKind.CONST
+            //        ,type,0L);
 
             long off=symbol.getStackOffset();
             if(varTable.isStart()){
